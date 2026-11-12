@@ -19,15 +19,17 @@ if os.getenv('RAILWAY_PUBLIC_DOMAIN'):
 CSRF_TRUSTED_ORIGINS = [
     o.strip() for o in os.getenv(
         'CSRF_TRUSTED_ORIGINS',
-        'https://*.railway.app,http://localhost:5173,http://127.0.0.1:5173',
+        'http://localhost:5173,http://127.0.0.1:5173,https://digitech-management.vercel.app',
     ).split(',')
-    if o.strip()
+    if o.strip() and '*' not in o
 ]
-# Expand wildcard railway origins into common pattern Django accepts via explicit host later
-CSRF_TRUSTED_ORIGINS = [o for o in CSRF_TRUSTED_ORIGINS if '*' not in o]
 railway_domain = os.getenv('RAILWAY_PUBLIC_DOMAIN')
 if railway_domain:
     CSRF_TRUSTED_ORIGINS.append(f'https://{railway_domain}')
+for origin in os.getenv('EXTRA_CSRF_ORIGINS', '').split(','):
+    origin = origin.strip()
+    if origin and origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -140,11 +142,27 @@ CORS_ALLOWED_ORIGINS = [
     o.strip()
     for o in os.getenv(
         'CORS_ALLOWED_ORIGINS',
-        'http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000',
+        'http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,https://digitech-management.vercel.app',
     ).split(',')
     if o.strip()
 ]
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r'^https://.*\.vercel\.app$',
+    r'^https://.*\.up\.railway\.app$',
+]
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+CORS_ALLOW_METHODS = ['DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT']
 CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL_ORIGINS', 'False').lower() == 'true'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
