@@ -2,27 +2,44 @@
 
 Django REST Framework API for Digitech Avenue CRM.
 
-## Setup
+## Local setup
 
 ```bash
 python3 -m venv venv
-source venv/bin/activate   # Windows: venv\Scripts\activate
+source venv/bin/activate
 pip install -r requirements.txt
 python manage.py migrate
-python manage.py seed_crm
+python manage.py create_production_users \
+  --admin-password 'YOUR_ADMIN_PASSWORD' \
+  --staff-password 'YOUR_STAFF_PASSWORD'
 python manage.py runserver
 ```
 
-API: http://127.0.0.1:8000/api/  
-Admin: http://127.0.0.1:8000/admin/
+API: http://127.0.0.1:8000/api/
 
-## Demo logins
+## Railway
 
-| Role | Username | Password |
-|------|----------|----------|
-| Owner | `owner` | `Owner@123` |
-| Project Manager | `pm` | `PM@12345` |
-| Developer | `dev` | `Dev@12345` |
+Crash fix included: `gunicorn`, Whitenoise, Postgres URL support, and pending migrations.
+
+Set these variables in Railway:
+
+| Variable | Example |
+|----------|---------|
+| `SECRET_KEY` | long random string |
+| `DEBUG` | `False` |
+| `ALLOWED_HOSTS` | `.railway.app,your-service.up.railway.app` |
+| `CORS_ALLOWED_ORIGINS` | `https://your-frontend-domain` |
+| `DATABASE_URL` | auto from Railway Postgres |
+
+Recommended: add a **PostgreSQL** plugin to the service.
+
+After deploy, create users from Railway console:
+
+```bash
+python manage.py create_production_users \
+  --admin-password 'Wq5a7E4DJlVJu#pB' \
+  --staff-password '&A&zgOLNkKiR3djK'
+```
 
 ## Notes
 
