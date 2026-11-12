@@ -165,13 +165,8 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 CORS_ALLOW_METHODS = ['DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT']
-# On Railway, allow all origins by default so Vercel can call the API even if
-# an older deploy didn't include the Vercel domain in CORS_ALLOWED_ORIGINS.
-_on_railway = bool(os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('RAILWAY_PROJECT_ID'))
-CORS_ALLOW_ALL_ORIGINS = os.getenv(
-    'CORS_ALLOW_ALL_ORIGINS',
-    'True' if _on_railway else 'False',
-).lower() == 'true'
+# Prefer explicit origins; set CORS_ALLOW_ALL_ORIGINS=True only as a temporary override.
+CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL_ORIGINS', 'False').lower() == 'true'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'noreply@digitechavenue.com'
