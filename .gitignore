@@ -13,3 +13,4 @@ staticfiles/
 .idea/
 .vscode/
 *.log
+PRODUCTION_CREDENTIALS.txt
