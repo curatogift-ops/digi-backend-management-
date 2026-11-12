@@ -51,9 +51,10 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # Must be before WhiteNoise/CommonMiddleware or CORS headers are missing.
+    'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -150,7 +151,8 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r'^https://.*\.vercel\.app$',
     r'^https://.*\.up\.railway\.app$',
 ]
-CORS_ALLOW_CREDENTIALS = True
+# JWT is sent via Authorization header (not cookies), so credentials mode is not required.
+CORS_ALLOW_CREDENTIALS = os.getenv('CORS_ALLOW_CREDENTIALS', 'False').lower() == 'true'
 CORS_ALLOW_HEADERS = [
     'accept',
     'accept-encoding',
@@ -163,8 +165,13 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 CORS_ALLOW_METHODS = ['DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT']
-# Set CORS_ALLOW_ALL_ORIGINS=True on Railway if a deploy is stuck on old code.
-CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL_ORIGINS', 'False').lower() == 'true'
+# On Railway, allow all origins by default so Vercel can call the API even if
+# an older deploy didn't include the Vercel domain in CORS_ALLOWED_ORIGINS.
+_on_railway = bool(os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('RAILWAY_PROJECT_ID'))
+CORS_ALLOW_ALL_ORIGINS = os.getenv(
+    'CORS_ALLOW_ALL_ORIGINS',
+    'True' if _on_railway else 'False',
+).lower() == 'true'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'noreply@digitechavenue.com'
