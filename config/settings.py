@@ -163,6 +163,7 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 CORS_ALLOW_METHODS = ['DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT']
+# Set CORS_ALLOW_ALL_ORIGINS=True on Railway if a deploy is stuck on old code.
 CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL_ORIGINS', 'False').lower() == 'true'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
